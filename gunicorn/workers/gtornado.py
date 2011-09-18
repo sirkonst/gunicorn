@@ -74,7 +74,20 @@ class TornadoWorker(Worker):
         httpserver.HTTPConnection.finish = finish
         sys.modules["tornado.httpserver"] = httpserver
 
-        server = tornado.httpserver.HTTPServer(app, io_loop=self.ioloop)
+        if self.cfg.certfile != None:
+            server = tornado.httpserver.HTTPServer(app, io_loop=self.ioloop, ssl_options={
+                    'keyfile': self.cfg.keyfile,
+                    'certfile': self.cfg.certfile,
+                    'cert_reqs': self.cfg.cert_reqs,
+                    'ssl_version': self.cfg.ssl_version,
+                    'ca_certs': self.cfg.ca_certs,
+                    'suppress_ragged_eofs': self.cfg.suppress_ragged_eofs,
+                    'ciphers': self.cfg.ciphers,
+                    # allow Tornado to do handshake
+                    'do_handshake_on_connect': False,
+                    })
+        else:
+            server = tornado.httpserver.HTTPServer(app, io_loop=self.ioloop)
         if hasattr(server, "add_socket"):  # tornado > 2.0
             server.add_socket(self.socket)
         elif hasattr(server, "_sockets"):  # tornado 2.0

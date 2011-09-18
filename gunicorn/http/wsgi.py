@@ -68,6 +68,7 @@ def create(req, sock, client, server, cfg):
 
     secure_headers = cfg.secure_scheme_headers
     x_forwarded_for_header = cfg.x_forwarded_for_header
+    certfile = cfg.certfile
 
     for hdr_name, hdr_value in req.headers:
         if hdr_name == "EXPECT":
@@ -78,6 +79,8 @@ def create(req, sock, client, server, cfg):
             forward = hdr_value
         elif (hdr_name.upper() in secure_headers and
               hdr_value == secure_headers[hdr_name.upper()]):
+            url_scheme = "https"
+        elif certfile != None:
             url_scheme = "https"
         elif hdr_name == "HOST":
             server = hdr_value
