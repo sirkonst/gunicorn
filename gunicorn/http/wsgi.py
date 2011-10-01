@@ -77,8 +77,10 @@ def create(req, sock, client, server, cfg):
                 sock.send("HTTP/1.1 100 Continue\r\n\r\n")
         elif hdr_name == x_forwarded_for_header:
             forward = hdr_value
-        elif (hdr_name.upper() in secure_headers and
-              hdr_value == secure_headers[hdr_name.upper()]):
+        elif certfile == None and \
+                (hdr_name.upper() in secure_headers
+                 and
+                 hdr_value == secure_headers[hdr_name.upper()]):
             url_scheme = "https"
         elif certfile != None:
             url_scheme = "https"
