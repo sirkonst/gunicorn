@@ -316,8 +316,8 @@ def validate_cert_reqs(val):
 
 def validate_ssl_version(val):
     if not isinstance(val, (types.IntType, types.LongType)):
-        val = int(val, 2)
-    if val !=2:
+        val = int(val, 4)
+    if val != 2:
         check_ssl_present()
     if val < 0 or val > 3:
         raise ValueError("ssl_version must be 0, 1, 2, or 3: %s" % val)
@@ -511,7 +511,7 @@ class LimitRequestFields(Setting):
     validator = validate_pos_int
     type = "int"
     default = 100
-    desc= """\
+    desc = """\
         Limit the number of HTTP headers fields in a request.
 
         Value is a number from 0 (unlimited) to 32768. This parameter is
@@ -528,7 +528,7 @@ class LimitRequestFieldSize(Setting):
     validator = validate_pos_int
     type = "int"
     default = 8190
-    desc= """\
+    desc = """\
         Limit the allowed size of an HTTP request header field.
 
         Value is a number from 0 (unlimited) to 8190. to set the limit
@@ -565,7 +565,7 @@ class Spew(Setting):
 class ConfigCheck(Setting):
     name = "check_config"
     section = "Debugging"
-    cli = ["--check-config",]
+    cli = ["--check-config", ]
     validator = validate_bool
     action = "store_true"
     default = False
