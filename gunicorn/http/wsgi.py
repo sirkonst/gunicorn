@@ -110,7 +110,7 @@ def create(req, sock, client, server, cfg):
 
         # find host and port on ipv6 address
         if '[' in forward and ']' in forward:
-            host =  forward.split(']')[0][1:].lower()
+            host = forward.split(']')[0][1:].lower()
         elif ":" in forward and forward.count(":") == 1:
             host = forward.split(":")[0].lower()
         else:
@@ -130,7 +130,7 @@ def create(req, sock, client, server, cfg):
     environ['REMOTE_PORT'] = str(remote[1])
 
     if isinstance(server, basestring):
-        server =  server.split(":")
+        server = server.split(":")
         if len(server) == 1:
             if url_scheme == "http":
                 server.append("80")
@@ -151,7 +151,7 @@ def create(req, sock, client, server, cfg):
 
 class Response(object):
 
-    def __init__(self, req, sock):
+    def __init__(self, req, sock, server_tokens_hide=False):
         self.req = req
         self.sock = sock
         self.version = SERVER_SOFTWARE
@@ -163,6 +163,7 @@ class Response(object):
         self.response_length = None
         self.sent = 0
         self.upgrade = False
+        self.server_tokens_hide = server_tokens_hide
 
     def force_close(self):
         self.must_close = True
@@ -215,7 +216,7 @@ class Response(object):
         # no Content-Length header set.
         if self.response_length is not None:
             return False
-        elif self.req.version <= (1,0):
+        elif self.req.version <= (1, 0):
             return False
         elif self.status.startswith("304") or self.status.startswith("204"):
             # Do not use chunked responses when the response is guaranteed to
@@ -235,10 +236,13 @@ class Response(object):
         headers = [
             "HTTP/%s.%s %s\r\n" % (self.req.version[0],
                 self.req.version[1], self.status),
-            "Server: %s\r\n" % self.version,
             "Date: %s\r\n" % util.http_date(),
             "Connection: %s\r\n" % connection
         ]
+
+        if not self.server_tokens_hide:
+            headers.append("Server: %s\r\n" % self.version)
+
         if self.chunked:
             headers.append("Transfer-Encoding: chunked\r\n")
         return headers
@@ -288,9 +292,9 @@ class Response(object):
                 nbytes -= BLKSIZE
         else:
             sent = 0
-            sent += sendfile(sockno, fileno, offset+sent, nbytes-sent)
+            sent += sendfile(sockno, fileno, offset + sent, nbytes - sent)
             while sent != nbytes:
-                sent += sendfile(sockno, fileno, offset+sent, nbytes-sent)
+                sent += sendfile(sockno, fileno, offset + sent, nbytes - sent)
 
     def write_file(self, respiter):
         if sendfile is not None and \
