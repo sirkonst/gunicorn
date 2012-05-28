@@ -963,13 +963,13 @@ class WorkerExit(Setting):
         the just-exited Worker.
         """
 
-class ServerTokensHide(Setting):
-    name = "server_tokens_hide"
+class ServerToken(Setting):
+    name = "server_token"
     section = "Server Mechanics"
-    cli = ["--server-tokens-hide"]
-    validator = validate_bool
-    action = "store_true"
-    default = False
+    cli = ["--server-token"]
+    meta = "STRING"
+    validator = validate_string
+    default = None
     desc = """\
-        Hide gunicorn version in the "Server" response header field.
+        Replace for header "Server" in response.
         """

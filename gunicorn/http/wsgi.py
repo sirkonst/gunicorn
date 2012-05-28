@@ -59,7 +59,7 @@ def default_environ(req, sock, cfg):
 
 
 def create(req, sock, client, server, cfg):
-    resp = Response(req, sock)
+    resp = Response(req, sock, cfg.server_token)
 
     environ = default_environ(req, sock, cfg)
 
@@ -151,7 +151,7 @@ def create(req, sock, client, server, cfg):
 
 class Response(object):
 
-    def __init__(self, req, sock, server_tokens_hide=False):
+    def __init__(self, req, sock, server_token=None):
         self.req = req
         self.sock = sock
         self.version = SERVER_SOFTWARE
@@ -163,7 +163,7 @@ class Response(object):
         self.response_length = None
         self.sent = 0
         self.upgrade = False
-        self.server_tokens_hide = server_tokens_hide
+        self.server_token = server_token
 
     def force_close(self):
         self.must_close = True
@@ -240,7 +240,9 @@ class Response(object):
             "Connection: %s\r\n" % connection
         ]
 
-        if not self.server_tokens_hide:
+        if self.server_token:
+            headers.append("Server: %s\r\n" % self.server_token)
+        else:
             headers.append("Server: %s\r\n" % self.version)
 
         if self.chunked:
