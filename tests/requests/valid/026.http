@@ -1,0 +1,3 @@
+GET /test/unicode_header HTTP/1.1\r\n
+Test: test тест\r\n
+\r\n
